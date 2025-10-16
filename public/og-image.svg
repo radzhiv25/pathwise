@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- PathWise Logo -->
+  <g transform="translate(100, 200)">
+    <circle cx="60" cy="180" r="30" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M90 180h120a35 35 0 0 0 0-70h-110a35 35 0 0 1 0-70H150" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="300" cy="60" r="30" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Title -->
+  <text x="600" y="200" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#1a202c" text-anchor="middle">PathWise</text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="280" font-family="Arial, sans-serif" font-size="36" fill="#4a5568" text-anchor="middle">AI-Powered Career Guidance</text>
+  
+  <!-- Description -->
+  <text x="600" y="380" font-family="Arial, sans-serif" font-size="24" fill="#718096" text-anchor="middle">Transform your career journey with personalized AI counseling</text>
+  
+  <!-- Features -->
+  <g transform="translate(200, 450)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="20" fill="#4a5568">• Personalized Guidance</text>
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="20" fill="#4a5568">• Data-Driven Insights</text>
+    <text x="0" y="60" font-family="Arial, sans-serif" font-size="20" fill="#4a5568">• Career Planning Tools</text>
+  </g>
+  
+  <g transform="translate(800, 450)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="20" fill="#4a5568">• Professional Development</text>
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="20" fill="#4a5568">• Job Search Support</text>
+    <text x="0" y="60" font-family="Arial, sans-serif" font-size="20" fill="#4a5568">• Expert Advice</text>
+  </g>
+</svg>

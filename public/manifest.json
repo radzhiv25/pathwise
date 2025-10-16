@@ -1,0 +1,40 @@
+{
+    "name": "PathWise - AI-Powered Career Guidance",
+    "short_name": "PathWise",
+    "description": "Transform your career journey with AI-powered counseling, personalized guidance, and data-driven insights.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#000000",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/apple-icon.png",
+            "sizes": "180x180",
+            "type": "image/png"
+        }
+    ],
+    "categories": [
+        "productivity",
+        "education",
+        "business"
+    ],
+    "lang": "en",
+    "dir": "ltr"
+}
