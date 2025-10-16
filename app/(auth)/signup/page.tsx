@@ -1,11 +1,14 @@
 import SignupForm from "@/components/common/auth/SignupForm";
+import { AuthGuard } from "@/components/common/auth/AuthGuard";
 
 export default function SignupPage() {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8">
-                <SignupForm />
+        <AuthGuard>
+            <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-md w-full space-y-8">
+                    <SignupForm />
+                </div>
             </div>
-        </div>
+        </AuthGuard>
     );
 }

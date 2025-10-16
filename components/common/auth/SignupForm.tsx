@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { authService } from "@/lib/auth";
+import { Eye, EyeOff } from "lucide-react";
 import {
     SignupFormData,
     SignupFormErrors,
@@ -23,6 +24,8 @@ const SignupForm = () => {
 
     const [errors, setErrors] = useState<SignupFormErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -125,17 +128,30 @@ const SignupForm = () => {
 
                             <Field>
                                 <FieldLabel htmlFor="password">Password</FieldLabel>
-                                <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    placeholder="Enter 6-digit password"
-                                    value={formData.password}
-                                    onChange={handleInputChange}
-                                    required
-                                    className={errors.password ? "border-destructive" : ""}
-                                    maxLength={6}
-                                />
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        name="password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="Enter 6-digit password"
+                                        value={formData.password}
+                                        onChange={handleInputChange}
+                                        required
+                                        className={errors.password ? "border-destructive pr-10" : "pr-10"}
+                                        maxLength={6}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="h-4 w-4" />
+                                        ) : (
+                                            <Eye className="h-4 w-4" />
+                                        )}
+                                    </button>
+                                </div>
                                 {errors.password && (
                                     <p className="text-destructive text-sm mt-1">{errors.password}</p>
                                 )}
@@ -143,17 +159,30 @@ const SignupForm = () => {
 
                             <Field>
                                 <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-                                <Input
-                                    id="confirmPassword"
-                                    name="confirmPassword"
-                                    type="password"
-                                    placeholder="Confirm 6-digit password"
-                                    value={formData.confirmPassword}
-                                    onChange={handleInputChange}
-                                    required
-                                    className={errors.confirmPassword ? "border-destructive" : ""}
-                                    maxLength={6}
-                                />
+                                <div className="relative">
+                                    <Input
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        placeholder="Confirm 6-digit password"
+                                        value={formData.confirmPassword}
+                                        onChange={handleInputChange}
+                                        required
+                                        className={errors.confirmPassword ? "border-destructive pr-10" : "pr-10"}
+                                        maxLength={6}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        {showConfirmPassword ? (
+                                            <EyeOff className="h-4 w-4" />
+                                        ) : (
+                                            <Eye className="h-4 w-4" />
+                                        )}
+                                    </button>
+                                </div>
                                 {errors.confirmPassword && (
                                     <p className="text-destructive text-sm mt-1">{errors.confirmPassword}</p>
                                 )}

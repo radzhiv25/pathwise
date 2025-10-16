@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { MessageCircle, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowRight, ChevronLeft, ChevronRight, Route, Send } from "lucide-react"
 import { Section } from "./section"
 
 const demoConversations = [
@@ -41,6 +42,7 @@ const demoConversations = [
 
 export function DemoSection() {
     const [currentDemo, setCurrentDemo] = useState(0)
+    const router = useRouter()
 
     const nextDemo = () => {
         setCurrentDemo((prev) => (prev + 1) % demoConversations.length)
@@ -50,20 +52,24 @@ export function DemoSection() {
         setCurrentDemo((prev) => (prev - 1 + demoConversations.length) % demoConversations.length)
     }
 
+    const handleTryPathWise = () => {
+        router.push('/login')
+    }
+
     return (
         <Section id="demo" className="bg-muted/30">
-            <div className="text-center mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <div className="text-center mb-12 md:mb-16">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4">
                     See PathWise in action
                 </h2>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
                     Explore real conversations and see how PathWise AI can help guide your career journey
                 </p>
             </div>
 
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto px-4">
                 {/* Demo Navigation */}
-                <div className="flex justify-center mb-8">
+                <div className="flex justify-center mb-6 md:mb-8">
                     <div className="flex space-x-2">
                         {demoConversations.map((_, index) => (
                             <button
@@ -79,55 +85,55 @@ export function DemoSection() {
                 {/* Demo Chat Interface */}
                 <Card className="shadow-2xl">
                     <CardContent className="p-0">
-                        <div className="bg-card border-b border-border p-4">
+                        <div className="bg-card border-b border-border p-3 md:p-4">
                             <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                                        <MessageCircle className="h-5 w-5 text-primary-foreground" />
+                                <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
+                                    <div className="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                                        <Route className="h-4 w-4 md:h-5 md:w-5 text-primary-foreground" />
                                     </div>
-                                    <div>
-                                        <h3 className="font-semibold text-foreground">
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="font-semibold text-foreground text-sm md:text-base truncate">
                                             {demoConversations[currentDemo].title}
                                         </h3>
-                                        <p className="text-sm text-muted-foreground">PathWise AI Career Counselor</p>
+                                        <p className="text-xs md:text-sm text-muted-foreground">PathWise AI Career Counselor</p>
                                     </div>
                                 </div>
-                                <div className="flex space-x-2">
-                                    <Button variant="ghost" size="sm" onClick={prevDemo}>
+                                <div className="flex space-x-1 md:space-x-2 flex-shrink-0">
+                                    <Button variant="ghost" size="sm" onClick={prevDemo} className="h-8 w-8 p-0">
                                         <ChevronLeft className="h-4 w-4" />
                                     </Button>
-                                    <Button variant="ghost" size="sm" onClick={nextDemo}>
+                                    <Button variant="ghost" size="sm" onClick={nextDemo} className="h-8 w-8 p-0">
                                         <ChevronRight className="h-4 w-4" />
                                     </Button>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="p-6 space-y-4 min-h-[300px]">
+                        <div className="p-4 md:p-6 space-y-3 md:space-y-4 min-h-[250px] md:min-h-[300px]">
                             {demoConversations[currentDemo].messages.map((message, index) => (
                                 <div
                                     key={index}
                                     className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                                 >
                                     <div
-                                        className={`max-w-md px-4 py-3 rounded-lg ${message.role === "user"
+                                        className={`max-w-[85%] sm:max-w-md px-3 md:px-4 py-2 md:py-3 rounded-lg ${message.role === "user"
                                             ? "bg-primary text-primary-foreground"
                                             : "bg-muted text-foreground"
                                             }`}
                                     >
-                                        <p className="text-sm">{message.content}</p>
+                                        <p className="text-xs md:text-sm leading-relaxed">{message.content}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="p-4 border-t border-border bg-muted/30">
-                            <div className="flex space-x-2">
-                                <div className="flex-1 bg-background border border-border rounded-lg px-4 py-2 text-sm text-muted-foreground">
+                        <div className="p-3 md:p-4 border-t border-border bg-muted/30 ">
+                            <div className="flex space-x-2 items-center">
+                                <div className="flex-1 bg-background border border-border rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm text-muted-foreground">
                                     Ask PathWise anything...
                                 </div>
-                                <Button size="sm">
-                                    <ArrowRight className="h-4 w-4" />
+                                <Button size="sm" className="px-2 md:px-3">
+                                    <Send className="h-3 w-3 md:h-4 md:w-4" />
                                 </Button>
                             </div>
                         </div>
@@ -135,12 +141,14 @@ export function DemoSection() {
                 </Card>
 
                 {/* Demo CTA */}
-                <div className="text-center mt-8">
-                    <Button asChild size="lg" className="text-lg px-8 py-6">
-                        <a href="/chat">
-                            Try PathWise yourself
-                            <ArrowRight className="ml-2 h-5 w-5" />
-                        </a>
+                <div className="text-center mt-6 md:mt-8">
+                    <Button
+                        onClick={handleTryPathWise}
+                        size="lg"
+                        className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full sm:w-auto"
+                    >
+                        Try PathWise yourself
+                        <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
                     </Button>
                 </div>
             </div>

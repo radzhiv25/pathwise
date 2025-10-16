@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { authService } from "@/lib/auth";
+import { Eye, EyeOff } from "lucide-react";
 import {
     LoginFormData,
     LoginFormErrors,
@@ -21,6 +22,7 @@ const LoginForm = () => {
 
     const [errors, setErrors] = useState<LoginFormErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -106,17 +108,30 @@ const LoginForm = () => {
                                         Forgot your password?
                                     </a>
                                 </div>
-                                <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    placeholder="Enter 6-digit password"
-                                    value={formData.password}
-                                    onChange={handleInputChange}
-                                    required
-                                    className={errors.password ? "border-destructive" : ""}
-                                    maxLength={6}
-                                />
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        name="password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="Enter 6-digit password"
+                                        value={formData.password}
+                                        onChange={handleInputChange}
+                                        required
+                                        className={errors.password ? "border-destructive pr-10" : "pr-10"}
+                                        maxLength={6}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="h-4 w-4" />
+                                        ) : (
+                                            <Eye className="h-4 w-4" />
+                                        )}
+                                    </button>
+                                </div>
                                 {errors.password && (
                                     <p className="text-destructive text-sm mt-1">{errors.password}</p>
                                 )}

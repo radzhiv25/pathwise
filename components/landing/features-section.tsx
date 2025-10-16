@@ -28,28 +28,28 @@ const features = [
 export function FeaturesSection() {
     return (
         <Section className="bg-muted/30">
-            <div className="text-center mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <div className="text-center mb-12 md:mb-16">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4">
                     Everything you need for
                     <br />
                     <span className="text-primary">career success with PathWise</span>
                 </h2>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
                     PathWise AI provides comprehensive career guidance tailored to your unique situation and goals.
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 {features.map((feature, index) => (
                     <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300">
-                        <CardHeader>
-                            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <feature.icon className="h-8 w-8 text-primary" />
+                        <CardHeader className="pb-4">
+                            <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                                <feature.icon className="h-6 w-6 md:h-8 md:w-8 text-primary" />
                             </div>
-                            <CardTitle className="text-xl">{feature.title}</CardTitle>
+                            <CardTitle className="text-lg md:text-xl">{feature.title}</CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <CardDescription className="text-base leading-relaxed">
+                        <CardContent className="pt-0">
+                            <CardDescription className="text-sm md:text-base leading-relaxed">
                                 {feature.description}
                             </CardDescription>
                         </CardContent>

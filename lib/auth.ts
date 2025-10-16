@@ -144,6 +144,42 @@ export const authService = {
         }
     },
 
+    // Check if user is already authenticated (has valid session/token)
+    async isAuthenticated(): Promise<boolean> {
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession()
+
+            if (error) {
+                console.warn('Auth session check error:', error.message)
+                return false
+            }
+
+            // Check if session exists and has access token
+            return !!(session?.access_token && session?.user)
+        } catch (error) {
+            console.warn('Auth session check failed:', error)
+            return false
+        }
+    },
+
+    // Get current session info
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async getSession(): Promise<{ session: any | null; error: string | null }> {
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession()
+
+            return {
+                session,
+                error: error?.message || null,
+            }
+        } catch (error) {
+            return {
+                session: null,
+                error: error instanceof Error ? error.message : 'An unexpected error occurred',
+            }
+        }
+    },
+
     // Listen to auth state changes
     onAuthStateChange(callback: (user: AuthUser | null) => void) {
         return supabase.auth.onAuthStateChange((event, session) => {

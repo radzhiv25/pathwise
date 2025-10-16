@@ -1,45 +1,66 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { authService, AuthUser } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ChatInterface from "@/components/chat/ChatInterface";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import { DashboardCardSkeleton, ChatSessionSkeleton, StatsSkeleton } from "@/components/ui/skeletons";
+import { trpc } from "@/lib/trpc-client";
+import { useAuth } from "@/hooks/useAuth";
 
 const DashboardPage = () => {
-    const [user, setUser] = useState<AuthUser | null>(null);
-    const [loading, setLoading] = useState(true);
     const [showChat, setShowChat] = useState(false);
     const router = useRouter();
+    const { user, loading, isAuthenticated, logout } = useAuth();
 
+    // Fetch chat sessions data
+    const { data: chatSessions, isLoading: sessionsLoading } = trpc.chat.getChatSessions.useQuery();
+
+    // Redirect to login if not authenticated
     useEffect(() => {
-        const checkUser = async () => {
-            const { user, error } = await authService.getCurrentUser();
-            if (error || !user) {
-                router.push('/login');
-            } else {
-                setUser(user);
-            }
-            setLoading(false);
-        };
-
-        checkUser();
-    }, [router]);
+        if (!loading && !isAuthenticated) {
+            router.push('/login');
+        }
+    }, [loading, isAuthenticated, router]);
 
     const handleLogout = async () => {
-        const { error } = await authService.signOut();
-        if (!error) {
-            router.push('/');
-        }
+        await logout();
     };
+
+    // Don't render anything if not authenticated (will redirect)
+    if (!loading && !isAuthenticated) {
+        return null;
+    }
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-foreground">Loading...</p>
+            <div className="min-h-screen bg-background py-8">
+                <div className="max-w-4xl mx-auto px-4">
+                    {/* Header Skeleton */}
+                    <div className="flex justify-between items-center mb-8">
+                        <div className="space-y-2">
+                            <div className="h-8 w-48 bg-muted animate-pulse rounded"></div>
+                            <div className="h-4 w-32 bg-muted animate-pulse rounded"></div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 bg-muted animate-pulse rounded"></div>
+                            <div className="h-8 w-16 bg-muted animate-pulse rounded"></div>
+                        </div>
+                    </div>
+
+                    {/* Dashboard Content Skeleton */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <DashboardCardSkeleton />
+                        <DashboardCardSkeleton />
+                        <DashboardCardSkeleton />
+                    </div>
+
+                    {/* Chat Preview Card Skeleton */}
+                    <div className="mt-8">
+                        <DashboardCardSkeleton />
+                    </div>
                 </div>
             </div>
         );
@@ -52,7 +73,7 @@ const DashboardPage = () => {
     if (showChat) {
         return (
             <div className="h-screen w-full">
-                <div className="flex justify-between items-center p-4 bg-background border-b border-border">
+                {/* <div className="flex justify-between items-center p-2 bg-background border-b border-border">
                     <h1 className="text-xl font-semibold text-foreground">Career Counseling Chat</h1>
                     <Button
                         variant="outline"
@@ -61,9 +82,9 @@ const DashboardPage = () => {
                     >
                         Back to Dashboard
                     </Button>
-                </div>
+                </div> */}
                 <div className="h-[calc(100vh-80px)] w-full">
-                    <ChatInterface />
+                    <ChatInterface onBackToDashboard={() => setShowChat(false)} />
                 </div>
             </div>
         );
@@ -78,13 +99,16 @@ const DashboardPage = () => {
                         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
                         <p className="text-muted-foreground">Welcome back, {user.name}!</p>
                     </div>
-                    <Button
-                        variant="outline"
-                        onClick={handleLogout}
-                        className="transition-colors duration-200"
-                    >
-                        Logout
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        <AnimatedThemeToggler className="p-1 rounded-md border border-border hover:bg-muted transition-colors" />
+                        <Button
+                            variant="outline"
+                            onClick={handleLogout}
+                            className="transition-colors duration-200"
+                        >
+                            Logout
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Dashboard Content */}
@@ -113,16 +137,45 @@ const DashboardPage = () => {
                         </CardContent>
                     </Card>
 
-                    {/* Quick Actions Card */}
+                    {/* Recent Chat Sessions Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Quick Actions</CardTitle>
-                            <CardDescription>Common tasks</CardDescription>
+                            <CardTitle>Recent Chat Sessions</CardTitle>
+                            <CardDescription>Your last 3 conversations</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-3">
+                                {sessionsLoading ? (
+                                    <>
+                                        <ChatSessionSkeleton />
+                                        <ChatSessionSkeleton />
+                                        <ChatSessionSkeleton />
+                                    </>
+                                ) : chatSessions && chatSessions.length > 0 ? (
+                                    chatSessions.slice(0, 3).map((session) => (
+                                        <div
+                                            key={session.id}
+                                            className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                                            onClick={() => setShowChat(true)}
+                                        >
+                                            <div className="font-medium text-sm truncate">
+                                                {session.title}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                                {new Date(session.updated_at).toLocaleDateString()}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                                {session.chat_messages?.[0]?.count || 0} messages
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center text-muted-foreground">
+                                        No chat sessions yet
+                                    </div>
+                                )}
                                 <Button
-                                    className="w-full"
+                                    className="w-max"
                                     variant="outline"
                                     onClick={() => setShowChat(true)}
                                 >
@@ -132,19 +185,42 @@ const DashboardPage = () => {
                         </CardContent>
                     </Card>
 
-                    {/* Stats Card */}
+                    {/* Chat Stats Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Account Stats</CardTitle>
-                            <CardDescription>Your activity summary</CardDescription>
+                            <CardTitle>Chat Statistics</CardTitle>
+                            <CardDescription>Your chat activity summary</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-3">
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Status:</span>
-                                    <span className="font-medium text-green-600 dark:text-green-400">Active</span>
+                            {sessionsLoading ? (
+                                <StatsSkeleton />
+                            ) : (
+                                <div className="space-y-3">
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Total Sessions:</span>
+                                        <span className="font-medium">
+                                            {chatSessions?.length || 0}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Total Messages:</span>
+                                        <span className="font-medium">
+                                            {chatSessions?.reduce((total, session) =>
+                                                total + (session.chat_messages?.[0]?.count || 0), 0
+                                            ) || 0}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Last Active:</span>
+                                        <span className="font-medium text-sm">
+                                            {chatSessions && chatSessions.length > 0
+                                                ? new Date(chatSessions[0].updated_at).toLocaleDateString()
+                                                : "Never"
+                                            }
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
@@ -160,12 +236,14 @@ const DashboardPage = () => {
                             <p className="text-muted-foreground">
                                 Get expert career advice tailored to your goals and aspirations.
                             </p>
-                            <Button
-                                onClick={() => setShowChat(true)}
-                                className="w-full"
-                            >
-                                Start Career Chat
-                            </Button>
+                            <div className="flex justify-start">
+                                <Button
+                                    onClick={() => setShowChat(true)}
+                                    className="w-max"
+                                >
+                                    Start Career Chat
+                                </Button>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
