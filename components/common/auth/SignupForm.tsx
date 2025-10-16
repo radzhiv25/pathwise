@@ -84,7 +84,7 @@ const SignupForm = () => {
                     <form onSubmit={handleSubmit}>
                         <FieldGroup>
                             {errors.general && (
-                                <div className="text-red-600 text-sm text-center mb-4 p-2 bg-red-50 rounded">
+                                <div className="text-destructive text-sm text-center mb-4 p-2 bg-destructive/10 rounded">
                                     {errors.general}
                                 </div>
                             )}
@@ -99,10 +99,10 @@ const SignupForm = () => {
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     required
-                                    className={errors.name ? "border-red-500" : ""}
+                                    className={errors.name ? "border-destructive" : ""}
                                 />
                                 {errors.name && (
-                                    <p className="text-red-600 text-sm mt-1">{errors.name}</p>
+                                    <p className="text-destructive text-sm mt-1">{errors.name}</p>
                                 )}
                             </Field>
 
@@ -116,10 +116,10 @@ const SignupForm = () => {
                                     value={formData.email}
                                     onChange={handleInputChange}
                                     required
-                                    className={errors.email ? "border-red-500" : ""}
+                                    className={errors.email ? "border-destructive" : ""}
                                 />
                                 {errors.email && (
-                                    <p className="text-red-600 text-sm mt-1">{errors.email}</p>
+                                    <p className="text-destructive text-sm mt-1">{errors.email}</p>
                                 )}
                             </Field>
 
@@ -133,11 +133,11 @@ const SignupForm = () => {
                                     value={formData.password}
                                     onChange={handleInputChange}
                                     required
-                                    className={errors.password ? "border-red-500" : ""}
+                                    className={errors.password ? "border-destructive" : ""}
                                     maxLength={6}
                                 />
                                 {errors.password && (
-                                    <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+                                    <p className="text-destructive text-sm mt-1">{errors.password}</p>
                                 )}
                             </Field>
 
@@ -151,11 +151,11 @@ const SignupForm = () => {
                                     value={formData.confirmPassword}
                                     onChange={handleInputChange}
                                     required
-                                    className={errors.confirmPassword ? "border-red-500" : ""}
+                                    className={errors.confirmPassword ? "border-destructive" : ""}
                                     maxLength={6}
                                 />
                                 {errors.confirmPassword && (
-                                    <p className="text-red-600 text-sm mt-1">{errors.confirmPassword}</p>
+                                    <p className="text-destructive text-sm mt-1">{errors.confirmPassword}</p>
                                 )}
                             </Field>
 
@@ -164,7 +164,7 @@ const SignupForm = () => {
                                     {isSubmitting ? "Creating Account..." : "Create Account"}
                                 </Button>
                                 <FieldDescription className="text-center">
-                                    Already have an account? <a href="/login" className="text-blue-600 hover:underline">Sign in</a>
+                                    Already have an account? <a href="/login" className="text-primary hover:underline">Sign in</a>
                                 </FieldDescription>
                             </Field>
                         </FieldGroup>

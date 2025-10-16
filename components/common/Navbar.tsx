@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { authService, AuthUser } from "@/lib/auth";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 const Navbar = () => {
     const router = useRouter();
@@ -32,58 +33,62 @@ const Navbar = () => {
     };
 
     return (
-        <div className="border border-gray-200 rounded-lg w-3/4 mx-auto top-5 relative p-3 text-xl font-semibold flex justify-between items-center bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
-            <h1 className="text-gray-900 font-semibold">
+        <div className="border border-border rounded-lg md:w-1/2 md:mx-auto mx-5 top-5 relative md:p-3 p-2 md:text-xl text-lg font-semibold flex justify-between items-center bg-background shadow-sm hover:shadow-md transition-shadow duration-200">
+            <h1 className="text-foreground font-semibold">
                 PathWise
             </h1>
 
-            {loading ? (
-                <div className="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
-            ) : user ? (
-                <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-600">
-                        Welcome, {user.name}
-                    </span>
-                    <Button
-                        variant="outline"
-                        onClick={() => router.push("/chat")}
-                        className="border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200"
-                    >
-                        Chat
-                    </Button>
-                    <Button
-                        variant="outline"
-                        onClick={() => router.push("/dashboard")}
-                        className="border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200"
-                    >
-                        Dashboard
-                    </Button>
-                    <Button
-                        variant="outline"
-                        onClick={handleLogout}
-                        className="border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200"
-                    >
-                        Logout
-                    </Button>
-                </div>
-            ) : (
-                <span className="flex gap-3">
-                    <Button
-                        variant="outline"
-                        onClick={() => router.push("/login")}
-                        className="border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200"
-                    >
-                        Login
-                    </Button>
-                    <Button
-                        variant="default"
-                        onClick={() => router.push("/signup")}
-                        className="bg-gray-900 hover:bg-gray-800 text-white transition-colors duration-200"
-                    >
-                        Signup
-                    </Button>
-                </span>
-            )}
+            <div className="flex items-center gap-3">
+                <AnimatedThemeToggler className="p-2 hover:bg-accent rounded-md transition-colors" />
+
+                {loading ? (
+                    <div className="animate-pulse bg-muted h-8 w-20 rounded"></div>
+                ) : user ? (
+                    <>
+                        <span className="text-sm text-muted-foreground">
+                            Welcome, {user.name}
+                        </span>
+                        <Button
+                            variant="outline"
+                            onClick={() => router.push("/chat")}
+                            className="transition-colors duration-200"
+                        >
+                            Chat
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => router.push("/dashboard")}
+                            className="transition-colors duration-200"
+                        >
+                            Dashboard
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={handleLogout}
+                            className="transition-colors duration-200"
+                        >
+                            Logout
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Button
+                            variant="outline"
+                            onClick={() => router.push("/login")}
+                            className="transition-colors duration-200"
+                        >
+                            Login
+                        </Button>
+                        <Button
+                            variant="default"
+                            onClick={() => router.push("/signup")}
+                            className="transition-colors duration-200"
+                        >
+                            Signup
+                        </Button>
+                    </>
+                )}
+            </div>
         </div>
     )
 }

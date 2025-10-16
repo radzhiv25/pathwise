@@ -38,8 +38,8 @@ const DashboardPage = () => {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-                    <p>Loading...</p>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-foreground">Loading...</p>
                 </div>
             </div>
         );
@@ -51,18 +51,18 @@ const DashboardPage = () => {
 
     if (showChat) {
         return (
-            <div className="h-screen">
-                <div className="flex justify-between items-center p-4 bg-white border-b">
-                    <h1 className="text-xl font-semibold">Career Counseling Chat</h1>
+            <div className="h-screen w-full">
+                <div className="flex justify-between items-center p-4 bg-background border-b border-border">
+                    <h1 className="text-xl font-semibold text-foreground">Career Counseling Chat</h1>
                     <Button
                         variant="outline"
                         onClick={() => setShowChat(false)}
-                        className="border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                        className="transition-colors duration-200"
                     >
                         Back to Dashboard
                     </Button>
                 </div>
-                <div className="h-[calc(100vh-80px)]">
+                <div className="h-[calc(100vh-80px)] w-full">
                     <ChatInterface />
                 </div>
             </div>
@@ -70,18 +70,18 @@ const DashboardPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className="min-h-screen bg-background py-8">
             <div className="max-w-4xl mx-auto px-4">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-                        <p className="text-gray-600">Welcome back, {user.name}!</p>
+                        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+                        <p className="text-muted-foreground">Welcome back, {user.name}!</p>
                     </div>
                     <Button
                         variant="outline"
                         onClick={handleLogout}
-                        className="border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                        className="transition-colors duration-200"
                     >
                         Logout
                     </Button>
@@ -99,15 +99,15 @@ const DashboardPage = () => {
                             <div className="space-y-2">
                                 <div>
                                     <span className="font-medium">Name:</span>
-                                    <p className="text-gray-600">{user.name}</p>
+                                    <p className="text-muted-foreground">{user.name}</p>
                                 </div>
                                 <div>
                                     <span className="font-medium">Email:</span>
-                                    <p className="text-gray-600">{user.email}</p>
+                                    <p className="text-muted-foreground">{user.email}</p>
                                 </div>
                                 <div>
                                     <span className="font-medium">User ID:</span>
-                                    <p className="text-gray-600 text-sm font-mono">{user.id}</p>
+                                    <p className="text-muted-foreground text-sm font-mono">{user.id}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -141,8 +141,8 @@ const DashboardPage = () => {
                         <CardContent>
                             <div className="space-y-3">
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Status:</span>
-                                    <span className="font-medium text-green-600">Active</span>
+                                    <span className="text-muted-foreground">Status:</span>
+                                    <span className="font-medium text-green-600 dark:text-green-400">Active</span>
                                 </div>
                             </div>
                         </CardContent>
@@ -157,12 +157,12 @@ const DashboardPage = () => {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            <p className="text-gray-600">
+                            <p className="text-muted-foreground">
                                 Get expert career advice tailored to your goals and aspirations.
                             </p>
                             <Button
                                 onClick={() => setShowChat(true)}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                                className="w-full"
                             >
                                 Start Career Chat
                             </Button>

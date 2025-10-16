@@ -1,13 +1,14 @@
 // tRPC setup and configuration
 import { initTRPC } from '@trpc/server';
 import { NextRequest } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 
 // Initialize tRPC
 const t = initTRPC.context<{
     req: NextRequest;
-    user: any;
-    supabase: any;
+    user: User | null;
+    supabase: SupabaseClient;
 }>().create();
 
 // Export router and procedure helpers
@@ -51,7 +52,7 @@ const getUser = t.middleware(async ({ next, ctx }) => {
                 supabase,
             },
         });
-    } catch (error) {
+    } catch {
         throw new Error('Authentication failed');
     }
 });

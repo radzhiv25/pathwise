@@ -74,7 +74,7 @@ const LoginForm = () => {
                     <form onSubmit={handleSubmit}>
                         <FieldGroup>
                             {errors.general && (
-                                <div className="text-red-600 text-sm text-center mb-4 p-2 bg-red-50 rounded">
+                                <div className="text-destructive text-sm text-center mb-4 p-2 bg-destructive/10 rounded">
                                     {errors.general}
                                 </div>
                             )}
@@ -89,10 +89,10 @@ const LoginForm = () => {
                                     value={formData.email}
                                     onChange={handleInputChange}
                                     required
-                                    className={errors.email ? "border-red-500" : ""}
+                                    className={errors.email ? "border-destructive" : ""}
                                 />
                                 {errors.email && (
-                                    <p className="text-red-600 text-sm mt-1">{errors.email}</p>
+                                    <p className="text-destructive text-sm mt-1">{errors.email}</p>
                                 )}
                             </Field>
 
@@ -114,11 +114,11 @@ const LoginForm = () => {
                                     value={formData.password}
                                     onChange={handleInputChange}
                                     required
-                                    className={errors.password ? "border-red-500" : ""}
+                                    className={errors.password ? "border-destructive" : ""}
                                     maxLength={6}
                                 />
                                 {errors.password && (
-                                    <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+                                    <p className="text-destructive text-sm mt-1">{errors.password}</p>
                                 )}
                             </Field>
 
@@ -127,7 +127,7 @@ const LoginForm = () => {
                                     {isSubmitting ? "Signing in..." : "Login"}
                                 </Button>
                                 <FieldDescription className="text-center">
-                                    Don&apos;t have an account? <a href="/signup" className="text-blue-600 hover:underline">Sign up</a>
+                                    Don&apos;t have an account? <a href="/signup" className="text-primary hover:underline">Sign up</a>
                                 </FieldDescription>
                             </Field>
                         </FieldGroup>

@@ -1,9 +1,11 @@
-import  LoginForm  from "@/components/common/auth/LoginForm";
+import LoginForm from "@/components/common/auth/LoginForm";
 
 const LoginPage = () => {
   return (
-    <div className="w-full max-w-sm fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-      <LoginForm />
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <LoginForm />
+      </div>
     </div>
   );
 };
