@@ -200,9 +200,6 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -211,14 +208,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Shadcn/ui](https://ui.shadcn.com/) - UI components
 - [Tailwind CSS](https://tailwindcss.com/) - Styling
 - [Lucide](https://lucide.dev/) - Icons
-
-## 📞 Support
-
-If you have any questions or need help, please:
-
-- Open an issue on GitHub
-- Contact us at support@pathwise.com
-- Check our [documentation](https://docs.pathwise.com)
 
 ---
 
