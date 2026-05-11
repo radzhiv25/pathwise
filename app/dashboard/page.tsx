@@ -129,10 +129,10 @@ const DashboardPage = () => {
                                     <span className="font-medium">Email:</span>
                                     <p className="text-muted-foreground">{user.email}</p>
                                 </div>
-                                <div>
+                                {/* <div>
                                     <span className="font-medium">User ID:</span>
                                     <p className="text-muted-foreground text-sm font-mono">{user.id}</p>
-                                </div>
+                                </div> */}
                             </div>
                         </CardContent>
                     </Card>
