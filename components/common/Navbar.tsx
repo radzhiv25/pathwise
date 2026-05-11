@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { authService, AuthUser } from "@/lib/auth";
@@ -37,15 +38,15 @@ const Navbar = () => {
     return (
         <div className="border border-border rounded-lg md:w-1/2 md:mx-auto mx-4 top-5 relative md:p-3 p-3 text-lg font-semibold bg-background shadow-sm hover:shadow-md transition-shadow duration-200">
             <div className="flex justify-between items-center">
-                <span className="flex items-center gap-2">
-                    <Route className="w-5 h-5 md:w-6 md:h-6" />
+                <Link href="/" className="group flex items-center gap-2 hover:opacity-90 transition-opacity">
+                    <Route className="w-5 h-5 shrink-0 text-primary md:w-6 md:h-6" aria-hidden />
                     <h1 className="text-foreground font-semibold text-base md:text-xl">
                         PathWise
                     </h1>
-                </span>
+                </Link>
 
                 <div className="flex items-center gap-2">
-                    <AnimatedThemeToggler className="p-1.5 hover:bg-accent rounded-md transition-colors" />
+                    <AnimatedThemeToggler className="p-1.5 text-primary hover:bg-accent hover:text-primary rounded-md transition-colors [&_svg]:text-current" />
 
                     {loading ? (
                         <div className="flex items-center gap-2">

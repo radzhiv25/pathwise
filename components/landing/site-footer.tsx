@@ -1,38 +1,37 @@
-import Link from "next/link"
-import { Section } from "./section"
+import Link from "next/link";
+import { Route } from "lucide-react";
 
 export function SiteFooter() {
-    return (
-        <footer className="bg-muted/30 border-t border-border">
-            <Section className="py-8">
-                <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                    <div className="text-center md:text-left">
-                        <h3 className="text-xl font-bold text-foreground mb-2">PathWise</h3>
-                        <p className="text-sm text-muted-foreground">
-                            AI-powered career guidance for your future.
-                        </p>
-                    </div>
+  return (
+    <footer className="border-t border-border bg-muted/20">
+      <div className="mx-auto flex max-w-4xl flex-col items-center justify-center gap-4 px-4 py-5 sm:flex-row sm:justify-between sm:gap-6">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Route className="size-4 shrink-0 text-primary" aria-hidden />
+          <span className="text-sm font-semibold text-foreground">PathWise</span>
+        </Link>
 
-                    <div className="flex space-x-6 text-sm text-muted-foreground">
-                        <Link href="/privacy" className="hover:text-foreground transition-colors">
-                            Privacy
-                        </Link>
-                        <Link href="/terms" className="hover:text-foreground transition-colors">
-                            Terms
-                        </Link>
-                        <Link href="/contact" className="hover:text-foreground transition-colors">
-                            Contact
-                        </Link>
-                    </div>
-                </div>
+        <nav
+          className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-muted-foreground"
+          aria-label="Legal"
+        >
+          <Link href="/privacy" className="hover:text-foreground transition-colors">
+            Privacy
+          </Link>
+          <Link href="/terms" className="hover:text-foreground transition-colors">
+            Terms
+          </Link>
+          <Link href="/contact" className="hover:text-foreground transition-colors">
+            Contact
+          </Link>
+        </nav>
 
-                <div className="border-t border-border mt-6 pt-6 text-center">
-                    <p className="text-xs text-muted-foreground">
-                        © 2024 PathWise. All rights reserved.
-                    </p>
-                </div>
-            </Section>
-        </footer>
-    )
+        <p className="text-xs text-muted-foreground tabular-nums sm:text-right">
+          © {new Date().getFullYear()} PathWise
+        </p>
+      </div>
+    </footer>
+  );
 }
-
