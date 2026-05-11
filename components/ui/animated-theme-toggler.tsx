@@ -1,8 +1,9 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Moon, Sun } from "lucide-react"
+// import { Moon, Sun } from "lucide-react"
 import { flushSync } from "react-dom"
+import { IconCircleHalf2 } from "@tabler/icons-react"
 
 import { cn } from "@/lib/utils"
 
@@ -78,7 +79,7 @@ export const AnimatedThemeToggler = ({
       className={cn(className)}
       {...props}
     >
-      {isDark ? <Sun /> : <Moon />}
+      {isDark ? <IconCircleHalf2 className="size-4.5" /> : <IconCircleHalf2 className="size-4.5" />}
       <span className="sr-only">Toggle theme</span>
     </button>
   )
