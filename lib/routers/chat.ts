@@ -3,10 +3,145 @@ import { z } from 'zod';
 import { router, protectedProcedure } from '../trpc';
 import { Anthropic } from '@anthropic-ai/sdk';
 
-// Initialize Claude
-const anthropic = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY!,
-});
+const AI_PROVIDER_VALUES = ['anthropic', 'openai', 'openrouter', 'mistral', 'gemini'] as const;
+type AiProvider = (typeof AI_PROVIDER_VALUES)[number];
+
+const CAREER_SYSTEM_PROMPT = `You are a professional career counselor with expertise in:
+- Career planning and development
+- Job search strategies
+- Resume and cover letter writing
+- Interview preparation
+- Skills assessment and development
+- Industry insights and trends
+- Work-life balance
+- Career transitions
+
+Provide helpful, actionable advice. Ask clarifying questions when needed. Be encouraging and supportive while being practical and realistic.`;
+
+type ConversationMessage = {
+    role: 'user' | 'assistant';
+    content: string;
+};
+
+function resolveProviderApiKey(provider: AiProvider, maybeInputKey?: string): string {
+    const inputKey = maybeInputKey?.trim();
+    if (inputKey) return inputKey;
+
+    const envKeyMap: Record<AiProvider, string | undefined> = {
+        anthropic: process.env.ANTHROPIC_API_KEY,
+        openai: process.env.OPENAI_API_KEY,
+        openrouter: process.env.OPENROUTER_API_KEY,
+        mistral: process.env.MISTRAL_API_KEY,
+        gemini: process.env.GEMINI_API_KEY,
+    };
+    return envKeyMap[provider]?.trim() ?? '';
+}
+
+async function getAiResponse(args: {
+    provider: AiProvider;
+    apiKey: string;
+    content: string;
+    messages: ConversationMessage[];
+}): Promise<string> {
+    const { provider, apiKey, content, messages } = args;
+    const conversationHistory = [...messages, { role: 'user' as const, content }];
+
+    if (provider === 'anthropic') {
+        const anthropic = new Anthropic({ apiKey });
+        const response = await anthropic.messages.create({
+            model: 'claude-3-haiku-20240307',
+            max_tokens: 1000,
+            system: CAREER_SYSTEM_PROMPT,
+            messages: conversationHistory,
+        });
+        const aiResponse = response.content[0];
+        if (aiResponse?.type !== 'text') throw new Error('Unexpected response type from Anthropic');
+        return aiResponse.text;
+    }
+
+    if (provider === 'gemini') {
+        const body = {
+            system_instruction: { parts: [{ text: CAREER_SYSTEM_PROMPT }] },
+            contents: conversationHistory.map((msg) => ({
+                role: msg.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: msg.content }],
+            })),
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 1000,
+            },
+        };
+
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(
+                apiKey
+            )}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            }
+        );
+
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`Gemini API error (${response.status}): ${text}`);
+        }
+
+        const data = (await response.json()) as {
+            candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+        };
+        const text = data.candidates?.[0]?.content?.parts?.map((part) => part.text ?? '').join('').trim();
+        if (!text) throw new Error('Gemini returned no text response');
+        return text;
+    }
+
+    const openAiCompatibleConfig: Record<
+        Exclude<AiProvider, 'anthropic' | 'gemini'>,
+        { baseUrl: string; model: string; extraHeaders?: Record<string, string> }
+    > = {
+        openai: { baseUrl: 'https://api.openai.com/v1', model: 'gpt-4o-mini' },
+        openrouter: {
+            baseUrl: 'https://openrouter.ai/api/v1',
+            model: 'openai/gpt-4o-mini',
+            extraHeaders: {
+                'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
+                'X-Title': 'PathWise',
+            },
+        },
+        mistral: { baseUrl: 'https://api.mistral.ai/v1', model: 'mistral-small-latest' },
+    };
+
+    const config = openAiCompatibleConfig[provider];
+    const response = await fetch(`${config.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+            ...config.extraHeaders,
+        },
+        body: JSON.stringify({
+            model: config.model,
+            temperature: 0.7,
+            messages: [
+                { role: 'system', content: CAREER_SYSTEM_PROMPT },
+                ...conversationHistory.map((msg) => ({ role: msg.role, content: msg.content })),
+            ],
+        }),
+    });
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`${provider} API error (${response.status}): ${text}`);
+    }
+
+    const data = (await response.json()) as {
+        choices?: Array<{ message?: { content?: string } }>;
+    };
+    const text = data.choices?.[0]?.message?.content?.trim();
+    if (!text) throw new Error(`${provider} returned no text response`);
+    return text;
+}
 
 // Zod schemas for validation
 const createChatSessionSchema = z.object({
@@ -16,6 +151,9 @@ const createChatSessionSchema = z.object({
 const sendMessageSchema = z.object({
     sessionId: z.string().uuid(),
     content: z.string().min(1),
+    provider: z.enum(AI_PROVIDER_VALUES).default('anthropic'),
+    /** Optional user-provided key from browser localStorage; not persisted server-side. */
+    apiKey: z.string().min(1).optional(),
 });
 
 const getMessagesSchema = z.object({
@@ -145,57 +283,24 @@ export const chatRouter = router({
             }
 
             try {
-                // Check if API key is available
-                if (!process.env.ANTHROPIC_API_KEY) {
-                    console.error('ANTHROPIC_API_KEY is not set in environment variables');
-                    throw new Error('ANTHROPIC_API_KEY environment variable is not set');
+                const provider = input.provider;
+                const apiKey = resolveProviderApiKey(provider, input.apiKey);
+
+                if (!apiKey) {
+                    throw new Error(
+                        `No API key configured for ${provider}. Set the provider env var on server or save your own key in Chat settings (stored in this browser's localStorage only).`
+                    );
                 }
-
-                console.log('Preparing AI request...');
-                console.log('Messages count:', messages.length);
-                console.log('User message:', input.content);
-
-                // Prepare conversation history for Claude
                 const conversationHistory = messages.map(msg => ({
                     role: msg.role as 'user' | 'assistant',
                     content: msg.content,
                 }));
-
-                // Add current user message
-                conversationHistory.push({
-                    role: 'user',
+                const aiText = await getAiResponse({
+                    provider,
+                    apiKey,
                     content: input.content,
-                });
-
-                console.log('Calling Claude API...');
-
-                // Get AI response from Claude
-                const response = await anthropic.messages.create({
-                    model: 'claude-3-haiku-20240307',
-                    max_tokens: 1000,
-                    system: `You are a professional career counselor with expertise in:
-- Career planning and development
-- Job search strategies
-- Resume and cover letter writing
-- Interview preparation
-- Skills assessment and development
-- Industry insights and trends
-- Work-life balance
-- Career transitions
-
-Provide helpful, actionable advice. Ask clarifying questions when needed. Be encouraging and supportive while being practical and realistic.`,
                     messages: conversationHistory,
                 });
-
-                console.log('Claude API response received');
-                console.log('Response content length:', response.content.length);
-
-                const aiResponse = response.content[0];
-                if (aiResponse.type !== 'text') {
-                    throw new Error('Unexpected response type from AI');
-                }
-
-                console.log('AI response text length:', aiResponse.text.length);
 
                 // Save AI response
                 const { data: aiMessage, error: aiMessageError } = await ctx.supabase
@@ -203,7 +308,7 @@ Provide helpful, actionable advice. Ask clarifying questions when needed. Be enc
                     .insert({
                         session_id: input.sessionId,
                         role: 'assistant',
-                        content: aiResponse.text,
+                        content: aiText,
                     })
                     .select()
                     .single();

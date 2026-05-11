@@ -2,11 +2,16 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChatMessageSkeleton, SidebarSkeleton } from "@/components/ui/skeletons";
+import {
+    ChatConversationSkeleton,
+    ChatTypingSkeleton,
+    SidebarSkeleton,
+} from "@/components/ui/skeletons";
 import { trpc } from "@/lib/trpc-client";
-import { Send, Plus, Trash2, ArrowLeft } from "lucide-react";
+import { Send, Plus, Trash2, ArrowLeft, KeyRound } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
@@ -31,6 +36,22 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    type AiProvider,
+    clearStoredProviderKey,
+    getStoredProvider,
+    getStoredProviderKey,
+    setStoredProvider,
+    setStoredProviderKey,
+} from "@/lib/anthropic-local-key";
 
 interface Message {
     id: string;
@@ -111,6 +132,7 @@ interface ChatInterfaceProps {
 }
 
 export default function ChatInterface({ onBackToDashboard }: ChatInterfaceProps) {
+    const router = useRouter();
     const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
     const [newMessage, setNewMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -119,15 +141,20 @@ export default function ChatInterface({ onBackToDashboard }: ChatInterfaceProps)
     const [localMessages, setLocalMessages] = useState<Message[]>([]);
     const [isStreaming, setIsStreaming] = useState(false);
     const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+    const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
+    const [providerDraft, setProviderDraft] = useState<AiProvider>("anthropic");
+    const [apiKeyDraft, setApiKeyDraft] = useState("");
+    const [apiKeyBanner, setApiKeyBanner] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     // tRPC queries and mutations
     const { data: sessions, refetch: refetchSessions } = trpc.chat.getChatSessions.useQuery();
-    const { data: messages } = trpc.chat.getMessages.useQuery(
+    const { data: serverMessagesData, isLoading: messagesLoading } = trpc.chat.getMessages.useQuery(
         { sessionId: selectedSessionId! },
         { enabled: !!selectedSessionId }
     );
+    const serverMessages = serverMessagesData as Message[] | undefined;
 
     const createSessionMutation = trpc.chat.createChatSession.useMutation({
         onSuccess: (newSession) => {
@@ -199,13 +226,21 @@ export default function ChatInterface({ onBackToDashboard }: ChatInterfaceProps)
         },
     });
 
+    useEffect(() => {
+        if (!apiKeyDialogOpen) return;
+        const provider = getStoredProvider();
+        setProviderDraft(provider);
+        setApiKeyDraft(getStoredProviderKey(provider) ?? "");
+        setApiKeyBanner("");
+    }, [apiKeyDialogOpen]);
+
     // Sync local messages with server messages
     useEffect(() => {
-        if (messages) {
-            setLocalMessages(messages);
+        if (serverMessages) {
+            setLocalMessages(serverMessages);
             setShouldAutoScroll(true); // Auto-scroll when loading a new session
         }
-    }, [messages]);
+    }, [serverMessages]);
 
     // Auto-scroll to bottom when new messages arrive (only if user hasn't scrolled up)
     useEffect(() => {
@@ -256,6 +291,8 @@ export default function ChatInterface({ onBackToDashboard }: ChatInterfaceProps)
             await sendMessageMutation.mutateAsync({
                 sessionId: selectedSessionId,
                 content: userMessage,
+                provider: getStoredProvider(),
+                apiKey: getStoredProviderKey(getStoredProvider()),
             });
         } catch (error) {
             // Remove the optimistic message on error
@@ -296,12 +333,20 @@ export default function ChatInterface({ onBackToDashboard }: ChatInterfaceProps)
         }
     };
 
+    const handleBackClick = () => {
+        if (onBackToDashboard) {
+            onBackToDashboard();
+            return;
+        }
+        router.push("/dashboard");
+    };
+
     return (
         <SidebarProvider defaultOpen={false}>
             <div className="flex h-screen w-full bg-background">
                 {/* Sidebar */}
                 <Sidebar>
-                    <SidebarHeader className="p-2 border-b border-border">
+                    <SidebarHeader className="border-b border-border p-3.5">
                         <Button
                             onClick={handleCreateNewChat}
                             className="w-full"
@@ -312,8 +357,8 @@ export default function ChatInterface({ onBackToDashboard }: ChatInterfaceProps)
                         </Button>
                     </SidebarHeader>
 
-                    <SidebarContent className="p-2">
-                        <SidebarGroup>
+                    <SidebarContent className="flex-1 p-3 pt-2">
+                        <SidebarGroup className="p-0">
                             <SidebarGroupContent>
                                 <SidebarMenu>
                                     {!sessions ? (
@@ -378,7 +423,7 @@ export default function ChatInterface({ onBackToDashboard }: ChatInterfaceProps)
                         <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
                             <SidebarTrigger className="flex-shrink-0" />
                             <button
-                                onClick={onBackToDashboard}
+                                onClick={handleBackClick}
                                 className="flex items-center space-x-1 text-muted-foreground hover:text-foreground px-2 py-1 rounded-md hover:bg-muted transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" />
@@ -388,11 +433,23 @@ export default function ChatInterface({ onBackToDashboard }: ChatInterfaceProps)
                                 Career Counseling Chat
                             </h1>
                         </div>
-                        <div className="hidden sm:flex items-center text-xs text-muted-foreground">
-                            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                                <span className="text-xs">⌘</span>B
-                            </kbd>
-                            <span className="ml-2">to toggle sidebar</span>
+                        <div className="flex flex-shrink-0 items-center gap-2">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                aria-label="AI provider and API key settings"
+                                onClick={() => setApiKeyDialogOpen(true)}
+                            >
+                                <KeyRound className="size-3.5 sm:mr-1" />
+                                <span className="hidden sm:inline">API key</span>
+                            </Button>
+                            <div className="hidden md:flex items-center text-xs text-muted-foreground">
+                                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                                    <span className="text-xs">⌘</span>B
+                                </kbd>
+                                <span className="ml-2">sidebar</span>
+                            </div>
                         </div>
                     </div>
 
@@ -401,12 +458,12 @@ export default function ChatInterface({ onBackToDashboard }: ChatInterfaceProps)
                             {/* Messages */}
                             <div ref={messagesContainerRef} className="flex-1 overflow-y-auto">
                                 <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-                                    {!localMessages || localMessages.length === 0 ? (
-                                        <>
-                                            <ChatMessageSkeleton isUser={false} />
-                                            <ChatMessageSkeleton isUser={true} />
-                                            <ChatMessageSkeleton isUser={false} />
-                                        </>
+                                    {messagesLoading && (serverMessages?.length ?? 0) === 0 ? (
+                                        <ChatConversationSkeleton />
+                                    ) : !localMessages || localMessages.length === 0 ? (
+                                        <div className="flex justify-center py-12">
+                                            <p className="text-sm text-muted-foreground">Send a message to get started</p>
+                                        </div>
                                     ) : (
                                         localMessages?.map((message: Message) => (
                                             <div
@@ -433,8 +490,9 @@ export default function ChatInterface({ onBackToDashboard }: ChatInterfaceProps)
                                         ))
                                     )}
 
-                                    {(isLoading || isStreaming) && (
-                                        <ChatMessageSkeleton isUser={false} />
+                                    {(isLoading || isStreaming) &&
+                                        (localMessages.length === 0 || localMessages[localMessages.length - 1]?.role !== "assistant") && (
+                                        <ChatTypingSkeleton />
                                     )}
 
                                     <div ref={messagesEndRef} />
@@ -481,6 +539,92 @@ export default function ChatInterface({ onBackToDashboard }: ChatInterfaceProps)
                     )}
                 </SidebarInset>
             </div>
+
+            <Dialog open={apiKeyDialogOpen} onOpenChange={setApiKeyDialogOpen}>
+                <DialogContent className="sm:max-w-md" showCloseButton>
+                    <DialogHeader>
+                        <DialogTitle>AI provider and API key</DialogTitle>
+                        <DialogDescription>
+                            Saved only in this browser&apos;s localStorage—not in our database. Each chat
+                            request may include your key so the server can call your selected provider.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-3 text-[0.7rem] leading-relaxed text-muted-foreground">
+                        <p>
+                            Devs can clear from the console:{" "}
+                            <code className="break-all rounded bg-muted px-1 py-px font-mono text-[0.65rem] text-foreground">
+                                {`localStorage.removeItem("pathwise_ai_key_${providerDraft}")`}
+                            </code>
+                        </p>
+                        {apiKeyBanner ? (
+                            <p className="text-foreground">{apiKeyBanner}</p>
+                        ) : null}
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="ai-provider">Provider</Label>
+                        <Select
+                            value={providerDraft}
+                            onValueChange={(value) => {
+                                const provider = value as AiProvider;
+                                setProviderDraft(provider);
+                                setApiKeyDraft(getStoredProviderKey(provider) ?? "");
+                                setApiKeyBanner("");
+                            }}
+                        >
+                            <SelectTrigger id="ai-provider">
+                                <SelectValue placeholder="Choose provider" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="anthropic">Anthropic</SelectItem>
+                                <SelectItem value="openai">OpenAI</SelectItem>
+                                <SelectItem value="openrouter">OpenRouter</SelectItem>
+                                <SelectItem value="mistral">Mistral</SelectItem>
+                                <SelectItem value="gemini">Gemini</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="anthropic-api-key">API key</Label>
+                        <Input
+                            id="anthropic-api-key"
+                            type="password"
+                            autoComplete="off"
+                            spellCheck={false}
+                            placeholder="Paste API key..."
+                            value={apiKeyDraft}
+                            onChange={(e) => setApiKeyDraft(e.target.value)}
+                        />
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={() => {
+                                clearStoredProviderKey(providerDraft);
+                                setApiKeyDraft("");
+                                setApiKeyBanner(`Cleared ${providerDraft} key from localStorage.`);
+                            }}
+                        >
+                            Clear stored key
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={() => {
+                                const trimmed = apiKeyDraft.trim();
+                                setStoredProvider(providerDraft);
+                                if (!trimmed) {
+                                    setApiKeyBanner("Enter a key or use Clear.");
+                                    return;
+                                }
+                                setStoredProviderKey(providerDraft, trimmed);
+                                setApiKeyBanner(`Saved. ${providerDraft} is active for new messages.`);
+                            }}
+                        >
+                            Save
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Delete Confirmation Dialog */}
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
