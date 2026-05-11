@@ -1,23 +1,15 @@
 import Navbar from "@/components/common/Navbar";
 import { HeroSection } from "@/components/landing/hero-section";
-import { FeaturesSection } from "@/components/landing/features-section";
-import { HowItWorksSection } from "@/components/landing/how-it-works-section";
-import { DemoSection } from "@/components/landing/demo-section";
-import { TechStackSection } from "@/components/landing/tech-stack-section";
-import { CTASection } from "@/components/landing/cta-section";
+import { LandingShowcase } from "@/components/landing/landing-showcase";
 import { SiteFooter } from "@/components/landing/site-footer";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
-      <main>
+      <main className="flex-1">
         <HeroSection />
-        <FeaturesSection />
-        <HowItWorksSection />
-        <DemoSection />
-        <TechStackSection />
-        <CTASection />
+        <LandingShowcase />
       </main>
       <SiteFooter />
     </div>

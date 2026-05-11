@@ -1,94 +1,179 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Play, Route, Send } from "lucide-react"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import {
+  ArrowRight,
+  KeyRound,
+  ListChecks,
+  LogIn,
+  MessageSquare,
+} from "lucide-react";
+import Link from "next/link";
+import { motion } from "motion/react";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 14 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.06 * i, duration: 0.45, ease: [0.22, 1, 0.36, 1] as const },
+  }),
+};
+
+const flowSteps = [
+  {
+    icon: LogIn,
+    title: "Sign in",
+    description: "Create an account or log in your sessions stay tied to you.",
+  },
+  {
+    icon: MessageSquare,
+    title: "Open a chat",
+    description: "Describe where you are: role, goals, blockers, or a fork in the road.",
+  },
+  {
+    icon: ListChecks,
+    title: "Get a clear path",
+    description: "Turn the thread into next steps you can actually act on this week.",
+  },
+  {
+    icon: KeyRound,
+    title: "Own the stack (optional)",
+    description: "Bring your own model keys; they live in this browser only when you choose.",
+  },
+] as const;
 
 export function HeroSection() {
-    return (
-        <div className="mt-10 min-h-screen flex items-center justify-center bg-background text-foreground">
-            <div className="max-w-3xl mx-auto px-4 text-center">
-                <div className="space-y-6 md:space-y-8">
-                    {/* Main Headline */}
-                    <div className="space-y-3 md:space-y-4 leading-tight">
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold tracking-tight">
-                            Find Your Path.
-                            <br />
-                            <span className="text-primary">Talk to PathWise</span>
-                            <br />
-                            AI Career Counselor.
-                        </h1>
-                        <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto leading-tight">
-                            Get personalized career guidance powered by PathWise AI. Discover your strengths,
-                            explore opportunities, and make informed decisions about your future.
-                        </p>
-                    </div>
+  return (
+    <section className="relative flex min-h-[calc(100vh-8rem)] flex-col items-center px-6 py-20 md:py-28">
+      <motion.div
+        aria-hidden
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_55%_at_50%_-15%,var(--primary)_12%,transparent_62%)] opacity-40 dark:opacity-35"
+      />
 
-                    {/* CTAs */}
-                    <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center">
-                        <Button asChild size="lg" className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full sm:w-auto">
-                            <Link href="/login">
-                                Start Chat
-                                <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-                            </Link>
-                        </Button>
-                        {/* <Button asChild variant="outline" size="lg" className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full sm:w-auto">
-                            <Link href="#demo">
-                                <Play className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-                                View Demo
-                            </Link>
-                        </Button> */}
-                    </div>
+      <div className="mx-auto flex w-full max-w-2xl flex-col items-center text-center">
+        <motion.p
+          custom={0}
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          className="mb-5 text-[0.65rem] font-medium uppercase tracking-[0.22em] text-muted-foreground"
+        >
+          PathWise
+        </motion.p>
 
-                    {/* Chat Interface Mockup */}
-                    <div className="mt-12 md:mt-16 relative">
-                        <div className="bg-card border border-border rounded-2xl p-4 md:p-6 shadow-2xl max-w-2xl mx-auto">
-                            <div className="space-y-3 md:space-y-4">
-                                {/* Chat Header */}
-                                <div className="flex items-center space-x-3 pb-3 md:pb-4 border-b border-border">
-                                    <div className="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-full flex items-center justify-center">
-                                        <Route className="h-4 w-4 md:h-5 md:w-5 text-primary-foreground" />
-                                    </div>
-                                    <div className="flex flex-col items-start min-w-0">
-                                        <h3 className="font-semibold text-foreground text-sm md:text-base">PathWise AI</h3>
-                                        <p className="text-xs md:text-sm text-muted-foreground">Career Counselor • Online now</p>
-                                    </div>
-                                </div>
+        <motion.h1
+          custom={1}
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          className="text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl"
+        >
+          Career guidance,{" "}
+          <span className="text-primary">without the noise.</span>
+        </motion.h1>
 
-                                {/* Chat Messages */}
-                                <div className="space-y-3 md:space-y-4">
-                                    <div className="flex justify-start">
-                                        <div className="bg-muted rounded-lg p-3 md:p-4 max-w-[85%] sm:max-w-sm">
-                                            <p className="text-xs md:text-sm">Hi! I&apos;m PathWise, your AI career counselor. What would you like to explore today?</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-end">
-                                        <div className="bg-primary text-primary-foreground rounded-lg p-3 md:p-4 max-w-[85%] sm:max-w-sm">
-                                            <p className="text-xs md:text-sm">I&apos;m interested in transitioning to tech. What skills should I focus on?</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-start">
-                                        <div className="bg-muted rounded-lg p-3 md:p-4 max-w-[85%] sm:max-w-sm">
-                                            <p className="text-xs md:text-sm">Great question! Based on your background, I&apos;d recommend starting with...</p>
-                                        </div>
-                                    </div>
-                                </div>
+        <motion.p
+          custom={2}
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          className="mt-5 max-w-md text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base"
+        >
+          PathWise is a focused career companion: one thread at a time, grounded questions, and
+          answers you can use not generic essays.
+        </motion.p>
 
-                                {/* Input Area */}
-                                <div className="flex items-center space-x-2 pt-3 md:pt-4 border-t border-border">
-                                    <div className="flex-1 bg-muted rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm text-muted-foreground">
-                                        Ask PathWise anything...
-                                    </div>
-                                    <Button size="sm" className="px-2 md:px-3">
-                                        <Send className="h-3 w-3 md:h-4 md:w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <motion.div
+          custom={3}
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          className="mt-10"
+        >
+          <Button asChild size="lg" className="rounded-full px-7">
+            <Link href="/login">
+              Start chat
+              <ArrowRight className="ml-2 size-4" />
+            </Link>
+          </Button>
+        </motion.div>
+      </div>
+
+      <motion.div
+        custom={4}
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="mx-auto mt-16 w-full max-w-3xl"
+      >
+        <p className="mb-3 text-center text-[0.65rem] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          How it works
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {flowSteps.map((step, index) => (
+            <motion.div
+              key={step.title}
+              custom={5 + index}
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              className="flex gap-3 rounded-lg border border-border bg-card/50 px-4 py-3 text-left ring-1 ring-foreground/5 backdrop-blur-sm transition-colors hover:bg-card/80"
+            >
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <step.icon className="size-4" aria-hidden />
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-sm font-medium text-foreground">{step.title}</h2>
+                <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                  {step.description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
         </div>
-    )
-}
+      </motion.div>
 
+      <motion.div
+        custom={9}
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="mx-auto mt-12 w-full max-w-xl"
+      >
+        <div className="rounded-xl border border-primary/40 bg-primary/5 px-5 py-5 text-center ring-1 ring-primary/15">
+          <p className="text-sm font-semibold tracking-tight text-foreground sm:text-base">
+            The point:{" "}
+            <span className="text-primary">clarity you can act on</span>, in a private workspace.
+          </p>
+          <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+            Fewer tabs, less jargon just a counselor-style dialogue that respects your context and
+            your boundaries.
+          </p>
+        </div>
+      </motion.div>
+
+      <motion.div
+        custom={10}
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="mx-auto mt-12 h-px w-16 bg-border"
+      />
+
+      <motion.p
+        custom={11}
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="mx-auto mt-8 max-w-md text-center text-xs leading-relaxed text-muted-foreground"
+      >
+        Optional: connect your own provider keys in chat (Anthropic, OpenAI, Gemini, and more) 
+        stored only in this device&apos;s localStorage when you save them.
+      </motion.p>
+    </section>
+  );
+}
