@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/providers/Providers";
+import { cn } from "@/lib/utils";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://pathwise.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "PathWise - AI-Powered Career Guidance",
   description: "Transform your career journey with AI-powered counseling, personalized guidance, and data-driven insights to help you make informed career decisions.",
   keywords: ["career counseling", "AI guidance", "career planning", "professional development", "job search", "career advice"],
@@ -34,33 +36,25 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://pathwise.app",
+    url: siteUrl,
     title: "PathWise - AI-Powered Career Guidance",
-    description: "Transform your career journey with AI-powered counseling, personalized guidance, and data-driven insights.",
+    description:
+      "Transform your career journey with AI-powered counseling, personalized guidance, and data-driven insights.",
     siteName: "PathWise",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "PathWise - AI-Powered Career Guidance",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "PathWise - AI-Powered Career Guidance",
-    description: "Transform your career journey with AI-powered counseling and personalized guidance.",
-    images: ["/og-image.png"],
+    description:
+      "Transform your career journey with AI-powered counseling and personalized guidance.",
   },
   icons: {
     icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/favicon.svg", type: "image/svg+xml", sizes: "any" },
     ],
-    apple: [
-      { url: "/apple-icon.png", sizes: "180x180" },
-    ],
+    apple: [{ url: "/apple-icon", sizes: "180x180", type: "image/png" }],
   },
   manifest: "/manifest.json",
 };
@@ -71,15 +65,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="w-full h-full">
+    <html
+      lang="en"
+      className={cn("w-full h-full font-sans", spaceGrotesk.variable, geistMono.variable)}
+    >
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+        <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased w-full h-full`}
-      >
+      <body className="antialiased w-full h-full">
         <Providers>
           {children}
         </Providers>
