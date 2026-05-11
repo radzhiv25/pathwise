@@ -1,13 +1,19 @@
 import SignupForm from "@/components/common/auth/SignupForm";
 import { AuthGuard } from "@/components/common/auth/AuthGuard";
+import Navbar from "@/components/common/Navbar";
+import { SiteFooter } from "@/components/landing/site-footer";
 
 export default function SignupPage() {
     return (
         <AuthGuard>
-            <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-md w-full space-y-8">
-                    <SignupForm />
-                </div>
+            <div className="min-h-screen flex flex-col bg-background">
+                <Navbar />
+                <main className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+                    <div className="max-w-md w-full space-y-8">
+                        <SignupForm />
+                    </div>
+                </main>
+                <SiteFooter />
             </div>
         </AuthGuard>
     );
